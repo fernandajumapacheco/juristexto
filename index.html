@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corretor de Texto - Claude Cookbooks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .check-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .clear-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .clear-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .results {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 100px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .suggestion {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .info-box h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✍️ Corretor de Texto</h1>
+        <p class="subtitle">Verifique ortografia, gramática e melhore seu texto</p>
+
+        <div class="input-section">
+            <label for="textInput">Digite ou cole seu texto aqui:</label>
+            <textarea 
+                id="textInput" 
+                placeholder="Escreva ou cole o texto que deseja corrigir..."
+            ></textarea>
+        </div>
+
+        <div class="button-container">
+            <button class="check-btn" onclick="checkText()">🔍 Verificar Texto</button>
+            <button class="clear-btn" onclick="clearAll()">🗑️ Limpar</button>
+        </div>
+
+        <div id="results" class="results">
+            <h2>📊 Resultados da Análise</h2>
+            <div id="resultsContent"></div>
+        </div>
+
+        <div class="info-box">
+            <h3>ℹ️ Sobre este Corretor</h3>
+            <p>
+                Este é um corretor de texto demonstrativo desenvolvido como parte do repositório 
+                <strong>Claude Cookbooks</strong>. Ele analisa seu texto em busca de erros comuns, 
+                problemas gramaticais e oferece sugestões de melhoria.
+            </p>
+            <p style="margin-top: 10px;">
+                <strong>Funcionalidades:</strong> Contagem de palavras, detecção de erros ortográficos básicos, 
+                análise de pontuação, e sugestões de melhoria de escrita.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function checkText() {
+            const text = document.getElementById('textInput').value.trim();
+            const resultsDiv = document.getElementById('results');
+            const resultsContent = document.getElementById('resultsContent');
+
+            if (!text) {
+                alert('Por favor, digite algum texto para verificar.');
+                return;
+            }
+
+            // Análise básica do texto
+            const words = text.split(/\s+/).filter(word => word.length > 0);
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 0);
+            const characters = text.length;
+
+            // Verificações simples
+            const issues = [];
+
+            // Verifica espaços duplos
+            if (text.includes('  ')) {
+                issues.push({
+                    type: 'error',
+                    message: 'Espaços duplos detectados',
+                    suggestion: 'Remova espaços extras entre palavras'
+                });
+            }
+
+            // Verifica pontuação no final
+            if (text.length > 0 && !/[.!?]$/.test(text.trim())) {
+                issues.push({
+                    type: 'error',
+                    message: 'Falta pontuação no final do texto',
+                    suggestion: 'Adicione um ponto final, exclamação ou interrogação'
+                });
+            }
+
+            // Verifica palavras comuns mal escritas (exemplos básicos)
+            const commonMistakes = {
+                'vc': 'você',
+                'tb': 'também',
+                'pq': 'porque',
+                'q': 'que',
+                'hj': 'hoje',
+                'mt': 'muito',
+                'blz': 'beleza'
+            };
+
+            words.forEach(word => {
+                const lowerWord = word.toLowerCase().replace(/[.,;!?]/, '');
+                if (commonMistakes[lowerWord]) {
+                    issues.push({
+                        type: 'suggestion',
+                        message: `"${word}" pode ser abreviação`,
+                        suggestion: `Considere usar "${commonMistakes[lowerWord]}"`
+                    });
+                }
+            });
+
+            // Verifica frases muito longas
+            sentences.forEach((sentence, index) => {
+                const sentenceWords = sentence.trim().split(/\s+/);
+                if (sentenceWords.length > 30) {
+                    issues.push({
+                        type: 'suggestion',
+                        message: `Frase ${index + 1} é muito longa (${sentenceWords.length} palavras)`,
+                        suggestion: 'Considere dividir em frases menores para melhor leitura'
+                    });
+                }
+            });
+
+            // Monta o HTML dos resultados
+            let html = '<div class="stats">';
+            html += `<div class="stat-card"><div class="stat-number">${words.length}</div><div class="stat-label">Palavras</div></div>`;
+            html += `<div class="stat-card"><div class="stat-number">${sentences.length}</div><div class="stat-label">Frases</div></div>`;
+            html += `<div class="stat-card"><div class="stat-number">${paragraphs.length}</div><div class="stat-label">Parágrafos</div></div>`;
+            html += `<div class="stat-card"><div class="stat-number">${characters}</div><div class="stat-label">Caracteres</div></div>`;
+            html += '</div>';
+
+            if (issues.length > 0) {
+                html += '<h3 style="margin-top: 20px; color: #333;">🔍 Problemas Encontrados:</h3>';
+                issues.forEach(issue => {
+                    html += `<div class="result-item">`;
+                    html += `<div class="${issue.type}">${issue.type === 'error' ? '❌' : '💡'} ${issue.message}</div>`;
+                    html += `<div style="margin-top: 8px; color: #666;">${issue.suggestion}</div>`;
+                    html += `</div>`;
+                });
+            } else {
+                html += '<div class="result-item" style="border-left-color: #27ae60;">';
+                html += '<div class="suggestion">✅ Nenhum problema óbvio detectado!</div>';
+                html += '<div style="margin-top: 8px; color: #666;">Seu texto parece estar bem formatado.</div>';
+                html += '</div>';
+            }
+
+            resultsContent.innerHTML = html;
+            resultsDiv.classList.add('show');
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function clearAll() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('resultsContent').innerHTML = '';
+        }
+
+        // Permite usar Enter com Ctrl para verificar
+        document.getElementById('textInput').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                checkText();
+            }
+        });
+    </script>
+</body>
+</html>

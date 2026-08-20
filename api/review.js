@@ -14,7 +14,7 @@ const SYSTEM_PROMPT = `Você é um assistente de redação jurídica em portugu�
 Regra de segurança inegociável: NUNCA altere nomes, datas, valores, números de processo, artigos de lei, fatos, pedidos ou quaisquer informações objetivas do texto original.
 Responda APENAS com o texto revisado, sem comentários, sem explicações, sem aspas envolvendo o texto todo.`;
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+const GEMINI_MODEL = "gemini-3.6-flash";
 
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");

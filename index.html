@@ -227,6 +227,13 @@
         flex-direction: column;
         gap: 8px;
       }
+      .pane-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        min-height: 30px;
+      }
 
       .editor {
         display: flex;
@@ -306,6 +313,8 @@
       }
       .btn {
         padding: 11px 16px;
+        min-width: 128px;
+        justify-content: center;
         border-radius: 10px;
         border: 1.5px solid transparent;
         cursor: pointer;
@@ -756,14 +765,7 @@
 
             <div class="panes" style="margin-top: 16px">
               <div class="pane">
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 8px;
-                  "
-                >
+                <div class="pane-head">
                   <label class="field-label" for="originalText"
                     >📝 Texto original</label
                   >
@@ -794,14 +796,7 @@
               </div>
 
               <div class="pane">
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    gap: 8px;
-                  "
-                >
+                <div class="pane-head">
                   <label class="field-label">✅ Texto revisado</label>
                   <div class="result-actions">
                     <button class="btn ghost" id="toggleView">

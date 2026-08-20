@@ -4,10 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>🖋️✨ JurisTexto — Assistente de Redação e Português Jurídico</title>
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="./manifest.json" />
     <meta name="theme-color" content="#6866a8" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
-    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -461,6 +461,13 @@
         gap: 8px;
         align-items: center;
       }
+      .result-actions .btn.ghost {
+        min-width: 0;
+        padding: 6px 13px;
+        border-radius: 999px;
+        font-size: 12.5px;
+        font-weight: 600;
+      }
 
       .daily {
         display: grid;
@@ -794,6 +801,13 @@
               <div class="pane">
                 <div class="pane-head">
                   <label class="field-label">✅ Texto revisado</label>
+                </div>
+                <div
+                  id="resultBox"
+                  class="result-area"
+                  aria-live="polite"
+                ></div>
+                <div class="meta" style="justify-content: space-between">
                   <div class="result-actions">
                     <button class="btn ghost" id="toggleView">
                       Ver original
@@ -809,11 +823,6 @@
                     >
                   </div>
                 </div>
-                <div
-                  id="resultBox"
-                  class="result-area"
-                  aria-live="polite"
-                ></div>
               </div>
             </div>
 
@@ -1751,7 +1760,7 @@
       // Registra o service worker (permite instalar como app e uso offline parcial)
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("/sw.js").catch(() => {});
+          navigator.serviceWorker.register("./sw.js").catch(() => {});
         });
       }
     </script>

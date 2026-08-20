@@ -1,361 +1,1702 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corretor de Texto - Claude Cookbooks</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>⚖️ JurisTexto — Assistente de Redação e Português Jurídico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      :root {
+        --deep-blue: #4c4a91;
+        --deep-blue-dark: #383667;
+        --accent: #7b7fd1;
+        --blue-gray: #6b6c8a;
+        --soft-green: #1f8f5f;
+        --soft-gold: #a9822f;
+        --bg: #eef1fb;
+        --bg-grad-1: #f3f4fd;
+        --bg-grad-2: #e4e2fb;
+        --card: #ffffff;
+        --muted: #9294b3;
+        --light: #f0f1fb;
+        --border: #d5d9f2;
+        --border-strong: #c7d6f7;
+        --text: #2a2a45;
+        --lilac-1: #abc0f6;
+        --lilac-2: #c7d6f7;
+        --lilac-3: #d5d9f2;
+        --lilac-4: #e4e2fb;
+        --lilac-5: #ede9fb;
+        --radius: 14px;
+        --radius-sm: 10px;
+        --shadow-sm: 0 1px 2px rgba(76, 74, 145, 0.07);
+        --shadow:
+          0 10px 30px -8px rgba(76, 74, 145, 0.18),
+          0 2px 8px rgba(76, 74, 145, 0.07);
+        --shadow-lg: 0 20px 50px -12px rgba(76, 74, 145, 0.24);
+        --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+        --font-sans:
+          "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font-sans);
+        background:
+          radial-gradient(
+            1200px 600px at 10% -10%,
+            #f8f7fe 0%,
+            transparent 60%
+          ),
+          radial-gradient(1000px 500px at 100% 0%, #eef0fc 0%, transparent 55%),
+          linear-gradient(180deg, var(--bg-grad-1), var(--bg-grad-2));
+        background-attachment: fixed;
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+        padding: 32px 20px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+      }
+      .wrap {
+        max-width: 1160px;
+        width: 100%;
+      }
 
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 22px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .brand-mark {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          155deg,
+          var(--deep-blue),
+          var(--deep-blue-dark)
+        );
+        box-shadow: 0 6px 16px rgba(11, 61, 102, 0.28);
+        font-size: 22px;
+        flex-shrink: 0;
+      }
+      .brand-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .title {
+        font-family: var(--font-serif);
+        font-size: 23px;
+        font-weight: 700;
+        color: var(--deep-blue);
+        letter-spacing: -0.01em;
+      }
+      .subtitle {
+        font-size: 13px;
+        color: var(--blue-gray);
+        font-weight: 500;
+      }
+      .header-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--soft-green);
+        background: #e9f7f0;
+        border: 1px solid #cfeee0;
+        padding: 6px 12px;
+        border-radius: 999px;
+      }
+      .header-badge .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--soft-green);
+        box-shadow: 0 0 0 3px rgba(31, 143, 95, 0.18);
+      }
+
+      main {
+        background: var(--card);
+        border-radius: 20px;
+        padding: 26px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+      }
+
+      /* Large layout: side-by-side editor + result */
+      @media (min-width: 960px) {
+        .grid {
+          grid-template-columns: 1fr 480px;
+        }
+      }
+
+      .editor {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .field-label {
+        font-weight: 700;
+        color: var(--deep-blue);
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      label {
+        font-weight: 600;
+        color: var(--deep-blue);
+        font-size: 14px;
+      }
+
+      .textarea-wrap {
+        position: relative;
+      }
+      textarea {
+        width: 100%;
+        min-height: 380px;
+        resize: vertical;
+        padding: 16px;
+        border-radius: var(--radius-sm);
+        border: 1.5px solid var(--border);
+        font-size: 15px;
+        line-height: 1.6;
+        font-family: inherit;
+        background: #fbfcfe;
+        color: var(--text);
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s,
+          background 0.15s;
+      }
+      textarea::placeholder {
+        color: var(--muted);
+      }
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(26, 95, 158, 0.1);
+      }
+
+      .meta {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .stat {
+        background: var(--light);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 6px 13px;
+        color: var(--blue-gray);
+        font-weight: 600;
+        font-size: 12.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .modes {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .mode {
+        flex: 1 1 160px;
+        min-width: 150px;
+        border-radius: var(--radius-sm);
+        padding: 14px;
+        background: var(--light);
+        border: 1.5px solid var(--border);
+        cursor: pointer;
+        transition:
+          transform 0.16s ease,
+          box-shadow 0.16s ease,
+          border-color 0.16s ease,
+          background 0.16s ease;
+        position: relative;
+      }
+      .mode:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 22px -6px rgba(11, 61, 102, 0.16);
+        border-color: var(--border-strong);
+      }
+      .mode input {
+        display: none;
+      }
+      .mode.selected {
+        border-color: var(--accent);
+        background: linear-gradient(180deg, #ffffff, #f3f8fd);
+        box-shadow:
+          0 6px 18px -4px rgba(26, 95, 158, 0.28),
+          inset 0 0 0 1px rgba(26, 95, 158, 0.15);
+      }
+      .mode.selected::after {
+        content: "✓";
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        color: var(--accent);
+        font-weight: 800;
+        font-size: 12px;
+      }
+      .mode h4 {
+        margin: 0;
+        font-size: 13px;
+        color: var(--deep-blue);
+        font-weight: 700;
+      }
+      .mode p {
+        margin: 6px 0 0;
+        font-size: 12px;
+        color: var(--blue-gray);
+        line-height: 1.4;
+      }
+
+      .controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 4px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        padding: 11px 16px;
+        border-radius: 10px;
+        border: 1.5px solid transparent;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 13.5px;
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease,
+          background 0.12s ease,
+          border-color 0.12s ease;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .btn.primary {
+        background: linear-gradient(155deg, var(--accent), var(--deep-blue));
+        color: #fff;
+        box-shadow: 0 6px 16px -4px rgba(11, 61, 102, 0.4);
+      }
+      .btn.primary:hover {
+        box-shadow: 0 8px 20px -4px rgba(11, 61, 102, 0.5);
+      }
+      .btn.ghost {
+        background: #fff;
+        border-color: var(--border);
+        color: var(--deep-blue);
+      }
+      .btn.ghost:hover {
+        border-color: var(--border-strong);
+        background: var(--light);
+      }
+      .btn.warn {
+        background: #fff;
+        border-color: var(--border);
+        color: #a13f3f;
+      }
+      .btn.warn:hover {
+        background: #fdf2f2;
+        border-color: #f0d0d0;
+      }
+
+      .checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--blue-gray);
+        font-size: 13.5px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .checkbox input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+        cursor: pointer;
+      }
+
+      .safety-card {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin-top: 6px;
+        padding: 14px 16px;
+        background: linear-gradient(135deg, #fbf8ef, #f7f2e4);
+        border: 1px solid #ecdfb8;
+        border-radius: var(--radius-sm);
+      }
+      .safety-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+        line-height: 1;
+      }
+      .safety-card strong {
+        color: var(--soft-gold);
+        font-size: 13px;
+        display: block;
+        margin-bottom: 3px;
+      }
+      .safety-card div.body {
+        color: #6b5d3a;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      /* Results column */
+      .results {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .card {
+        background: var(--card);
+        border-radius: var(--radius-sm);
+        padding: 16px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+      }
+      .card-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-weight: 700;
+        color: var(--deep-blue);
+        font-size: 14px;
+      }
+      .result-area {
+        min-height: 240px;
+        padding: 14px;
+        background: var(--light);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        font-size: 15px;
+        line-height: 1.65;
+        white-space: pre-wrap;
+        overflow: auto;
+        color: var(--text);
+      }
+      .result-area:empty::before {
+        content: "O texto revisado aparecerá aqui.";
+        color: var(--muted);
+        font-style: italic;
+      }
+
+      .result-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .daily {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      @media (min-width: 680px) and (max-width: 959px) {
+        .daily {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      .daily .tip {
+        padding: 14px;
+        border-radius: 12px;
+        background: linear-gradient(180deg, #fff, #fbfbff);
+        border: 1.5px solid var(--border);
+        border-left: 4px solid var(--tip-accent, var(--lilac-1));
+        transition:
+          box-shadow 0.15s,
+          border-color 0.15s,
+          transform 0.15s;
+      }
+      .daily .tip:hover {
+        box-shadow: 0 8px 20px -6px rgba(76, 74, 145, 0.2);
+        border-color: var(--border-strong);
+        transform: translateY(-2px);
+      }
+      .daily .tip.tip-portugues {
+        --tip-accent: #abc0f6;
+      }
+      .daily .tip.tip-conectivo {
+        --tip-accent: #7b7fd1;
+      }
+      .daily .tip.tip-palavra {
+        --tip-accent: #a98fd6;
+      }
+      .tip-word {
+        font-family: var(--font-serif);
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--deep-blue);
+      }
+      .tip-role {
+        display: inline-block;
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--tip-accent, var(--accent));
+        background: var(--lilac-5);
+        border-radius: 999px;
+        padding: 2px 9px;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+      .tip-meaning {
+        margin-top: 6px;
+        color: var(--text);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .tip-example {
+        margin-top: 6px;
+        color: var(--blue-gray);
+        font-size: 12.5px;
+        line-height: 1.5;
+        font-style: italic;
+        padding-left: 10px;
+        border-left: 2px solid var(--lilac-3);
+      }
+
+      .favorites {
+        margin-top: 8px;
+      }
+      .fav-empty {
+        color: var(--muted);
+        font-size: 13px;
+        font-style: italic;
+        padding: 6px 0;
+      }
+      .fav-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-size: 13.5px;
+      }
+      .fav-item:hover {
+        background: var(--light);
+      }
+      .fav-item .fav-remove {
+        background: none;
+        border: none;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 6px;
+        border-radius: 6px;
+      }
+      .fav-item .fav-remove:hover {
+        color: #a13f3f;
+        background: #fdf2f2;
+      }
+
+      .privacy-card {
+        font-size: 13px;
+        color: var(--blue-gray);
+        line-height: 1.5;
+      }
+      .privacy-card strong {
+        color: var(--deep-blue);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13.5px;
+        margin-bottom: 6px;
+      }
+
+      footer {
+        margin-top: 20px;
+        font-size: 12.5px;
+        color: var(--blue-gray);
+        padding: 0 4px;
+      }
+      a.small {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      a.small:hover {
+        text-decoration: underline;
+      }
+
+      /* modal */
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(8, 16, 28, 0.55);
+        backdrop-filter: blur(3px);
+        z-index: 60;
+        padding: 20px;
+      }
+      .modal .panel {
+        width: min(760px, 95%);
+        max-height: 88vh;
+        overflow: auto;
+        background: #fff;
+        border-radius: 16px;
+        padding: 26px;
+        box-shadow: var(--shadow-lg);
+      }
+      .modal h3 {
+        font-family: var(--font-serif);
+        color: var(--deep-blue);
+        margin: 0 0 4px;
+        font-size: 20px;
+      }
+      .modal p {
+        margin: 0;
+      }
+
+      .bank-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 8px;
+      }
+      .bank-group {
+        margin-bottom: 4px;
+      }
+      .bank-group strong {
+        display: block;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--blue-gray);
+        margin-bottom: 8px;
+      }
+      .chip {
+        padding: 8px 10px;
+        background: var(--light);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--deep-blue);
+        cursor: pointer;
+        transition:
+          background 0.12s,
+          border-color 0.12s,
+          transform 0.12s;
+        text-align: center;
+        font-weight: 500;
+      }
+      .chip:hover {
+        background: #e9f1fa;
+        border-color: var(--border-strong);
+        transform: translateY(-1px);
+      }
+
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #c9d5e2;
+        border-radius: 8px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #aebccc;
+      }
+
+      @media (max-width: 600px) {
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+          padding: 14px 10px;
         }
-
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 900px;
-            width: 100%;
-            padding: 40px;
+        main {
+          padding: 16px;
+          border-radius: 16px;
         }
-
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-            text-align: center;
+        .controls {
+          flex-direction: column;
+          align-items: stretch;
         }
-
-        .subtitle {
-            color: #666;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.1em;
+        .btn {
+          justify-content: center;
         }
-
-        .input-section {
-            margin-bottom: 30px;
-        }
-
-        label {
-            display: block;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 200px;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            resize: vertical;
-            transition: border-color 0.3s;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .button-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            flex: 1;
-            min-width: 150px;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .check-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .check-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .clear-btn {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .clear-btn:hover {
-            background: #e0e0e0;
-        }
-
-        .results {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            min-height: 100px;
-            display: none;
-        }
-
-        .results.show {
-            display: block;
-        }
-
-        .result-item {
-            background: white;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .result-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .error {
-            color: #e74c3c;
-            font-weight: 600;
-        }
-
-        .suggestion {
-            color: #27ae60;
-            font-weight: 600;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2em;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        .stat-label {
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .info-box {
-            background: #e8f4f8;
-            border-left: 4px solid #3498db;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-
-        .info-box h3 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .info-box p {
-            color: #555;
-            line-height: 1.6;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            .button-container {
-                flex-direction: column;
-            }
-
-            button {
-                width: 100%;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>✍️ Corretor de Texto</h1>
-        <p class="subtitle">Verifique ortografia, gramática e melhore seu texto</p>
-
-        <div class="input-section">
-            <label for="textInput">Digite ou cole seu texto aqui:</label>
-            <textarea 
-                id="textInput" 
-                placeholder="Escreva ou cole o texto que deseja corrigir..."
-            ></textarea>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="brand">
+          <div class="brand-mark">⚖️</div>
+          <div class="brand-text">
+            <div class="title">JurisTexto</div>
+            <div class="subtitle">
+              Assistente de Redação e Português Jurídico
+            </div>
+          </div>
         </div>
-
-        <div class="button-container">
-            <button class="check-btn" onclick="checkText()">🔍 Verificar Texto</button>
-            <button class="clear-btn" onclick="clearAll()">🗑️ Limpar</button>
+        <div class="header-badge">
+          <span class="dot"></span> Processamento local
         </div>
+      </header>
 
-        <div id="results" class="results">
-            <h2>📊 Resultados da Análise</h2>
-            <div id="resultsContent"></div>
-        </div>
+      <main>
+        <div class="grid">
+          <section class="editor">
+            <div>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  gap: 8px;
+                "
+              >
+                <label class="field-label" for="originalText"
+                  >📝 Texto original</label
+                >
+                <span
+                  id="autosaveHint"
+                  style="
+                    font-size: 11.5px;
+                    color: var(--soft-green);
+                    font-weight: 600;
+                    opacity: 0;
+                    transition: opacity 0.3s;
+                  "
+                  >💾 Rascunho salvo</span
+                >
+              </div>
+              <div class="textarea-wrap" style="margin-top: 8px">
+                <textarea
+                  id="originalText"
+                  placeholder="Cole ou escreva aqui o texto que deseja revisar..."
+                ></textarea>
+              </div>
+              <div
+                class="meta"
+                style="margin-top: 10px; justify-content: space-between"
+              >
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <div class="stat" id="wordCount">📊 Palavras: 0</div>
+                  <div class="stat" id="charCount">Caracteres: 0</div>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center">
+                  <label class="checkbox"
+                    ><input type="checkbox" id="preserveInfo" checked />
+                    Preservar informações do texto original</label
+                  >
+                </div>
+              </div>
+            </div>
 
-        <div class="info-box">
-            <h3>ℹ️ Sobre este Corretor</h3>
-            <p>
-                Este é um corretor de texto demonstrativo desenvolvido como parte do repositório 
-                <strong>Claude Cookbooks</strong>. Ele analisa seu texto em busca de erros comuns, 
-                problemas gramaticais e oferece sugestões de melhoria.
-            </p>
-            <p style="margin-top: 10px;">
-                <strong>Funcionalidades:</strong> Contagem de palavras, detecção de erros ortográficos básicos, 
-                análise de pontuação, e sugestões de melhoria de escrita.
-            </p>
+            <div>
+              <label class="field-label">Como deseja revisar?</label>
+              <div class="modes" id="modes" style="margin-top: 10px">
+                <label class="mode" data-mode="objetivar">
+                  <input type="radio" name="mode" value="objetivar" />
+                  <h4>1. Tornar mais objetivo</h4>
+                  <p>Reduzir redundâncias e prolixidade preservando o sentido.</p>
+                </label>
+                <label class="mode" data-mode="melhorar">
+                  <input type="radio" name="mode" value="melhorar" />
+                  <h4>2. Melhorar redação jurídica</h4>
+                  <p>Aprimorar fluidez, conectivos e vocabulário jurídico.</p>
+                </label>
+                <label class="mode selected" data-mode="completo">
+                  <input type="radio" name="mode" value="completo" checked />
+                  <h4>3. Revisão completa</h4>
+                  <p>
+                    Corrige o português e combina objetividade com fluidez
+                    jurídica.
+                  </p>
+                </label>
+              </div>
+
+              <div class="controls">
+                <button
+                  class="btn primary"
+                  id="reviewBtn"
+                  title="Atalho: Ctrl/Cmd + Enter"
+                >
+                  ⚖️ Revisar texto
+                </button>
+                <button class="btn ghost" id="copyBtn">Copiar texto</button>
+                <button class="btn warn" id="clearBtn">Limpar</button>
+                <button class="btn" id="bankBtn">🔗 Banco de conectivos</button>
+              </div>
+            </div>
+
+            <div class="safety-card">
+              <div class="safety-icon">🛡️</div>
+              <div>
+                <strong>Regra de segurança</strong>
+                <div class="body">
+                  Não alterar nomes, datas, valores, números de processo,
+                  artigos de lei, fatos, pedidos ou demais informações
+                  objetivas.
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="results">
+            <div class="card">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  gap: 8px;
+                "
+              >
+                <div class="card-title">✅ Texto revisado</div>
+                <div class="result-actions">
+                  <button class="btn ghost" id="toggleView">
+                    Ver original
+                  </button>
+                  <span
+                    id="copiedLabel"
+                    style="
+                      color: var(--soft-green);
+                      font-weight: 700;
+                      display: none;
+                    "
+                    >✓ Copiado</span
+                  >
+                </div>
+              </div>
+              <div
+                id="resultBox"
+                class="result-area"
+                aria-live="polite"
+                style="margin-top: 10px"
+              ></div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">⏱️ 3 Minutos de Português Jurídico</div>
+              <div class="daily" id="dailyTips"></div>
+              <div style="margin-top: 14px">
+                <div class="card-title" style="font-size: 13px">
+                  ⭐ Meu vocabulário
+                </div>
+                <div id="favoritesArea" class="favorites"></div>
+              </div>
+            </div>
+            <div class="card privacy-card">
+              <strong>🔒 Privacidade</strong>
+              <div>
+                Os recursos locais desta página são executados no próprio
+                navegador. Não insira informações sigilosas em recursos externos
+                de IA sem verificar previamente as condições de tratamento dos
+                dados.
+              </div>
+              <div style="margin-top: 6px">
+                Ferramenta de apoio à redação. Revise o conteúdo antes da
+                utilização.
+              </div>
+            </div>
+          </aside>
         </div>
+      </main>
+
+      <footer>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+          "
+        >
+          <div>© JurisTexto — Ferramenta local para apoio à redação</div>
+          <div>
+            <a class="small" href="#bank" id="openBankSmall"
+              >🔗 Banco de conectivos</a
+            >
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Modal Banco de Conectivos -->
+    <div id="bankModal" class="modal" style="display: none">
+      <div class="panel">
+        <h3>Banco de conectivos</h3>
+        <p style="color: var(--blue-gray)">
+          Selecione conectivos por finalidade. Clique em um item para copiá-lo.
+        </p>
+        <div
+          style="
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            flex-direction: column;
+          "
+        >
+          <div class="bank-group">
+            <strong>Conclusão</strong>
+            <div class="bank-list" id="bankConclusion"></div>
+          </div>
+          <div class="bank-group">
+            <strong>Contraste</strong>
+            <div class="bank-list" id="bankContrast"></div>
+          </div>
+          <div class="bank-group">
+            <strong>Adição</strong>
+            <div class="bank-list" id="bankAddition"></div>
+          </div>
+          <div class="bank-group">
+            <strong>Explicação</strong>
+            <div class="bank-list" id="bankExplain"></div>
+          </div>
+          <div class="bank-group">
+            <strong>Contextualização</strong>
+            <div class="bank-list" id="bankContext"></div>
+          </div>
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 18px;
+          "
+        >
+          <button class="btn ghost" id="closeBank">Fechar</button>
+        </div>
+      </div>
     </div>
 
     <script>
-        function checkText() {
-            const text = document.getElementById('textInput').value.trim();
-            const resultsDiv = document.getElementById('results');
-            const resultsContent = document.getElementById('resultsContent');
+      // --- Data para '3 Minutos' ---
+      // Cada item tem: dica/palavra, explicação e um exemplo de uso.
+      const tips = [
+        {
+          text: 'Evite pleonasmos: "subir para cima" é redundante.',
+          meaning:
+            "Pleonasmo é repetir uma ideia já implícita na frase, o que enfraquece a objetividade do texto jurídico.",
+          example: 'Prefira "subir" em vez de "subir para cima".',
+        },
+        {
+          text: "Prefira frases curtas para facilitar a leitura jurídica.",
+          meaning:
+            "Frases longas com muitas orações intercaladas dificultam a compreensão do leitor, mesmo em textos técnicos.",
+          example:
+            'Em vez de uma frase com 5 orações, divida em 2 ou 3 frases objetivas.',
+        },
+        {
+          text: "Use pontuação para separar orações coordenadas quando necessário.",
+          meaning:
+            "A vírgula antes de conjunções como 'mas', 'porém' e 'contudo' evita ambiguidade na leitura.",
+          example: '"O réu compareceu, mas não apresentou defesa."',
+        },
+        {
+          text: "Cuidado ao abreviar: prefira termos por extenso em peças oficiais.",
+          meaning:
+            "Abreviações não padronizadas podem gerar dúvida sobre o termo exato empregado.",
+          example: 'Escreva "artigo 5º" em vez de "art° 5".',
+        },
+        {
+          text: "Mantenha concordância verbal com o sujeito próximo do verbo.",
+          meaning:
+            "Quando há sujeito composto, o verbo geralmente concorda com o núcleo mais próximo em construções específicas.",
+          example: '"Houve, entre as partes, acordo e renúncia ao prazo."',
+        },
+        {
+          text: "Evite termos coloquiais em petições e despachos.",
+          meaning:
+            "A linguagem jurídica exige registro formal, mesmo quando o assunto é simples.",
+          example: 'Prefira "não obstante" a "mesmo assim".',
+        },
+        {
+          text: "Use voz ativa quando desejar clareza e objetividade.",
+          meaning:
+            "A voz ativa deixa explícito quem pratica a ação, tornando o texto mais direto.",
+          example: '"O juiz indeferiu o pedido" em vez de "o pedido foi indeferido".',
+        },
+        {
+          text: "Evite usar gerúndio em excesso: prefira verbos no tempo adequado.",
+          meaning:
+            "O uso excessivo de gerúndio ('estar fazendo', 'vindo a') pode tornar o texto impreciso quanto ao tempo do fato.",
+          example: '"Informa que cumprirá a decisão" em vez de "vindo a cumprir".',
+        },
+        {
+          text: "Numere itens e pedidos quando forem vários para organização.",
+          meaning:
+            "A numeração facilita a leitura do juiz e a referência a pontos específicos da peça.",
+          example: '"Requer-se: a) a citação do réu; b) a produção de provas."',
+        },
+        {
+          text: "Considere frases introdutórias claras antes de argumentos complexos.",
+          meaning:
+            "Uma frase-síntese no início do parágrafo ajuda o leitor a entender a linha argumentativa antes dos detalhes.",
+          example: '"Trata-se de pedido de tutela de urgência, pelos motivos a seguir."',
+        },
+        {
+          text: "Use conectivos coerentes para articular ideias entre parágrafos.",
+          meaning:
+            "Conectivos bem escolhidos evidenciam a relação lógica entre as ideias (causa, contraste, conclusão).",
+          example: '"Diante disso, conclui-se que o pedido merece acolhimento."',
+        },
+        {
+          text: "Revise nomes próprios e números de processos com atenção redobrada.",
+          meaning:
+            "Erros nesses dados podem comprometer a validade ou a identificação correta da peça.",
+          example: "Confira sempre o número do CNJ antes de protocolar.",
+        },
+        {
+          text: "Ao citar legislação, mantenha a referência exata (art., §, inc.).",
+          meaning:
+            "Citações incompletas ou incorretas enfraquecem a fundamentação jurídica.",
+          example: '"Art. 5º, § 2º, inciso III, da Constituição Federal."',
+        },
+        {
+          text: "Evite jargões desnecessários: clareza supera pedantismo.",
+          meaning:
+            "Usar termos rebuscados sem necessidade pode prejudicar a compreensão sem agregar valor técnico.",
+          example: 'Prefira "provar" a "carrear aos autos elementos comprobatórios", quando possível.',
+        },
+        {
+          text: "Prefira termos jurídicos consolidados em vez de sinônimos incertos.",
+          meaning:
+            "Termos técnicos já consagrados evitam ambiguidade de interpretação.",
+          example: 'Use "sentença" e não "decisão final" quando o termo técnico for exigido.',
+        },
+      ];
 
-            if (!text) {
-                alert('Por favor, digite algum texto para verificar.');
-                return;
-            }
+      const connectives = [
+        {
+          text: "nesse contexto",
+          meaning: "Introduz uma retomada do cenário ou situação já apresentada, situando o argumento seguinte.",
+          example: '"Nesse contexto, cabe examinar se houve violação ao devido processo legal."',
+        },
+        {
+          text: "diante disso",
+          meaning: "Indica consequência lógica do que foi exposto anteriormente.",
+          example: '"Diante disso, requer-se o deferimento da medida liminar."',
+        },
+        {
+          text: "por conseguinte",
+          meaning: "Expressa conclusão decorrente diretamente do raciocínio anterior.",
+          example: '"Por conseguinte, resta demonstrada a ilegalidade do ato."',
+        },
+        {
+          text: "ademais",
+          meaning: "Acrescenta um argumento adicional que reforça o que já foi dito.",
+          example: '"Ademais, o contrato prevê expressamente essa hipótese."',
+        },
+        {
+          text: "além disso",
+          meaning: "Soma um novo elemento ou argumento à ideia anterior.",
+          example: '"Além disso, não há prova de má-fé por parte do requerente."',
+        },
+        {
+          text: "com efeito",
+          meaning: "Confirma ou reforça uma afirmação anterior, quase como 'de fato'.",
+          example: '"Com efeito, a jurisprudência é pacífica nesse sentido."',
+        },
+        {
+          text: "não obstante",
+          meaning: "Introduz uma ideia contrária, equivalente a 'apesar disso'.",
+          example: '"Não obstante, o réu deixou de comprovar o alegado."',
+        },
+        {
+          text: "contudo",
+          meaning: "Marca contraste ou oposição entre duas ideias.",
+          example: '"O prazo é exíguo; contudo, deve ser respeitado."',
+        },
+        {
+          text: "por outro lado",
+          meaning: "Apresenta um ponto de vista oposto ou complementar ao anterior.",
+          example: '"Por outro lado, a parte contrária não impugnou o documento."',
+        },
+        {
+          text: "nesse sentido",
+          meaning: "Indica que o que segue está alinhado ou corrobora a ideia anterior.",
+          example: '"Nesse sentido, decidiu o Tribunal em caso análogo."',
+        },
+        {
+          text: "à vista disso",
+          meaning: "Introduz uma conclusão baseada nos fatos ou argumentos já expostos.",
+          example: '"À vista disso, impõe-se a improcedência do pedido."',
+        },
+        {
+          text: "em razão disso",
+          meaning: "Indica causa direta que leva à consequência apresentada em seguida.",
+          example: '"Em razão disso, o contrato foi rescindido unilateralmente."',
+        },
+        {
+          text: "portanto",
+          meaning: "Conclui um raciocínio de forma direta e objetiva.",
+          example: '"Portanto, o pedido deve ser julgado procedente."',
+        },
+        {
+          text: "assim",
+          meaning: "Introduz uma conclusão simples e direta a partir do que foi dito.",
+          example: '"Assim, não há óbice ao prosseguimento do feito."',
+        },
+        {
+          text: "pois bem",
+          meaning: "Retoma o fio da argumentação para avançar num novo ponto.",
+          example: '"Pois bem, passa-se à análise do mérito."',
+        },
+        {
+          text: "doravante",
+          meaning: "Indica que, a partir daquele ponto, algo passa a valer ou ser considerado.",
+          example: '"Doravante, as intimações serão feitas por meio eletrônico."',
+        },
+        {
+          text: "outrossim",
+          meaning: "Acrescenta um argumento adicional, com registro formal.",
+          example: '"Outrossim, requer-se a produção de prova testemunhal."',
+        },
+        {
+          text: "de fato",
+          meaning: "Confirma a veracidade de uma afirmação anterior.",
+          example: '"De fato, o documento juntado comprova a alegação."',
+        },
+        {
+          text: "de qualquer modo",
+          meaning: "Indica que, independentemente do que foi dito, a conclusão se mantém.",
+          example: '"De qualquer modo, o prazo recursal já havia se encerrado."',
+        },
+        {
+          text: "de outro giro",
+          meaning: "Expressão jurídica para marcar mudança de perspectiva ou contraste, equivalente a 'por outro lado'.",
+          example: '"De outro giro, o autor não comprovou o dano alegado."',
+        },
+      ];
 
-            // Análise básica do texto
-            const words = text.split(/\s+/).filter(word => word.length > 0);
-            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-            const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 0);
-            const characters = text.length;
+      const vocabulary = [
+        {
+          text: "corroborar",
+          meaning: "Confirmar, reforçar uma afirmação ou tese com novos elementos.",
+          example: '"As provas juntadas corroboram a versão apresentada na inicial."',
+        },
+        {
+          text: "evidenciar",
+          meaning: "Tornar evidente, claro; demonstrar algo de forma inequívoca.",
+          example: '"Os documentos evidenciam o descumprimento contratual."',
+        },
+        {
+          text: "demonstrar",
+          meaning: "Provar por meio de argumentos ou evidências.",
+          example: '"Pretende-se demonstrar a existência do dano moral."',
+        },
+        {
+          text: "elucidar",
+          meaning: "Esclarecer, tornar compreensível um ponto obscuro ou controverso.",
+          example: '"O laudo pericial elucida a dinâmica do acidente."',
+        },
+        {
+          text: "consignar",
+          meaning: "Registrar formalmente algo em ata, termo ou documento.",
+          example: '"Ficou consignado em ata a ausência do réu."',
+        },
+        {
+          text: "salientar",
+          meaning: "Destacar, chamar atenção para um ponto importante.",
+          example: '"Salienta-se que o prazo é preclusivo."',
+        },
+        {
+          text: "ressaltar",
+          meaning: "Enfatizar, dar relevo a determinado argumento ou fato.",
+          example: '"Ressalta-se a boa-fé do requerente durante a negociação."',
+        },
+        {
+          text: "depreender",
+          meaning: "Concluir, inferir algo a partir da análise de fatos ou textos.",
+          example: '"Depreende-se dos autos que houve má-fé processual."',
+        },
+        {
+          text: "inferir",
+          meaning: "Deduzir logicamente a partir de premissas ou indícios.",
+          example: '"É possível inferir a intenção das partes pelo contexto contratual."',
+        },
+        {
+          text: "constatar",
+          meaning: "Verificar e confirmar um fato por observação direta.",
+          example: '"O perito constatou a existência de vício de construção."',
+        },
+        {
+          text: "verificar",
+          meaning: "Examinar para confirmar a veracidade ou exatidão de algo.",
+          example: '"Cumpre ao juízo verificar o preenchimento dos requisitos legais."',
+        },
+        {
+          text: "aduzir",
+          meaning: "Apresentar, alegar argumentos ou razões.",
+          example: '"O requerido aduz que não foi devidamente notificado."',
+        },
+        {
+          text: "asseverar",
+          meaning: "Afirmar com convicção e firmeza.",
+          example: '"A testemunha asseverou não ter presenciado o fato."',
+        },
+        {
+          text: "sustentar",
+          meaning: "Defender uma tese ou argumento com base em fundamentos.",
+          example: '"A defesa sustenta a nulidade da citação."',
+        },
+        {
+          text: "fundamentar",
+          meaning: "Justificar uma decisão ou argumento com base legal ou fática.",
+          example: '"A sentença deve fundamentar as razões do convencimento do juiz."',
+        },
+        {
+          text: "impugnar",
+          meaning: "Contestar formalmente um ato, documento ou alegação.",
+          example: '"A parte impugnou o valor apresentado no cálculo."',
+        },
+        {
+          text: "postular",
+          meaning: "Requerer, pleitear algo perante o juízo.",
+          example: '"O autor postula a condenação da ré ao pagamento de danos morais."',
+        },
+        {
+          text: "pugnar",
+          meaning: "Insistir, requerer com veemência.",
+          example: '"Pugna-se pelo reconhecimento da prescrição."',
+        },
+        {
+          text: "consubstanciar",
+          meaning: "Materializar, dar corpo concreto a uma ideia ou direito.",
+          example: '"O documento consubstancia o acordo firmado entre as partes."',
+        },
+        {
+          text: "descriminar",
+          meaning: "Discriminar, especificar item a item; também usado como excluir a natureza criminosa de um ato.",
+          example: '"A planilha descrimina os valores devidos mês a mês."',
+        },
+      ];
 
-            // Verificações simples
-            const issues = [];
+      // --- Connectives bank categories ---
+      const bank = {
+        conclusion: [
+          "portanto",
+          "por conseguinte",
+          "assim",
+          "diante disso",
+          "à vista disso",
+        ],
+        contrast: ["contudo", "entretanto", "não obstante", "por outro lado"],
+        addition: ["ademais", "além disso", "ainda", "igualmente"],
+        explanation: ["com efeito", "pois bem", "nesse sentido"],
+        context: [
+          "nesse contexto",
+          "diante desse cenário",
+          "no caso em análise",
+        ],
+      };
 
-            // Verifica espaços duplos
-            if (text.includes('  ')) {
-                issues.push({
-                    type: 'error',
-                    message: 'Espaços duplos detectados',
-                    suggestion: 'Remova espaços extras entre palavras'
-                });
-            }
+      // --- Utilities ---
+      const el = (id) => document.getElementById(id);
 
-            // Verifica pontuação no final
-            if (text.length > 0 && !/[.!?]$/.test(text.trim())) {
-                issues.push({
-                    type: 'error',
-                    message: 'Falta pontuação no final do texto',
-                    suggestion: 'Adicione um ponto final, exclamação ou interrogação'
-                });
-            }
+      // --- Word / char count ---
+      function updateCounts() {
+        const t = el("originalText").value || "";
+        const words = t.trim().length
+          ? t.trim().split(/\s+/).filter(Boolean).length
+          : 0;
+        const chars = t.length;
+        el("wordCount").textContent = `📊 Palavras: ${words}`;
+        el("charCount").textContent = `Caracteres: ${chars}`;
+      }
 
-            // Verifica palavras comuns mal escritas (exemplos básicos)
-            const commonMistakes = {
-                'vc': 'você',
-                'tb': 'também',
-                'pq': 'porque',
-                'q': 'que',
-                'hj': 'hoje',
-                'mt': 'muito',
-                'blz': 'beleza'
-            };
+      // --- Autosave do rascunho (localStorage) ---
+      const DRAFT_KEY = "juris_draft_text";
+      let autosaveTimer = null;
+      function saveDraft() {
+        const t = el("originalText");
+        clearTimeout(autosaveTimer);
+        autosaveTimer = setTimeout(() => {
+          if (t.value.trim()) localStorage.setItem(DRAFT_KEY, t.value);
+          else localStorage.removeItem(DRAFT_KEY);
+          showAutosaveHint();
+        }, 500);
+      }
+      function showAutosaveHint() {
+        const hint = el("autosaveHint");
+        if (!hint) return;
+        hint.style.opacity = "1";
+        setTimeout(() => (hint.style.opacity = "0"), 1200);
+      }
+      function restoreDraft() {
+        const saved = localStorage.getItem(DRAFT_KEY);
+        if (saved) {
+          el("originalText").value = saved;
+          updateCounts();
+        }
+      }
 
-            words.forEach(word => {
-                const lowerWord = word.toLowerCase().replace(/[.,;!?]/, '');
-                if (commonMistakes[lowerWord]) {
-                    issues.push({
-                        type: 'suggestion',
-                        message: `"${word}" pode ser abreviação`,
-                        suggestion: `Considere usar "${commonMistakes[lowerWord]}"`
-                    });
-                }
-            });
-
-            // Verifica frases muito longas
-            sentences.forEach((sentence, index) => {
-                const sentenceWords = sentence.trim().split(/\s+/);
-                if (sentenceWords.length > 30) {
-                    issues.push({
-                        type: 'suggestion',
-                        message: `Frase ${index + 1} é muito longa (${sentenceWords.length} palavras)`,
-                        suggestion: 'Considere dividir em frases menores para melhor leitura'
-                    });
-                }
-            });
-
-            // Monta o HTML dos resultados
-            let html = '<div class="stats">';
-            html += `<div class="stat-card"><div class="stat-number">${words.length}</div><div class="stat-label">Palavras</div></div>`;
-            html += `<div class="stat-card"><div class="stat-number">${sentences.length}</div><div class="stat-label">Frases</div></div>`;
-            html += `<div class="stat-card"><div class="stat-number">${paragraphs.length}</div><div class="stat-label">Parágrafos</div></div>`;
-            html += `<div class="stat-card"><div class="stat-number">${characters}</div><div class="stat-label">Caracteres</div></div>`;
-            html += '</div>';
-
-            if (issues.length > 0) {
-                html += '<h3 style="margin-top: 20px; color: #333;">🔍 Problemas Encontrados:</h3>';
-                issues.forEach(issue => {
-                    html += `<div class="result-item">`;
-                    html += `<div class="${issue.type}">${issue.type === 'error' ? '❌' : '💡'} ${issue.message}</div>`;
-                    html += `<div style="margin-top: 8px; color: #666;">${issue.suggestion}</div>`;
-                    html += `</div>`;
-                });
-            } else {
-                html += '<div class="result-item" style="border-left-color: #27ae60;">';
-                html += '<div class="suggestion">✅ Nenhum problema óbvio detectado!</div>';
-                html += '<div style="margin-top: 8px; color: #666;">Seu texto parece estar bem formatado.</div>';
-                html += '</div>';
-            }
-
-            resultsContent.innerHTML = html;
-            resultsDiv.classList.add('show');
-            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      // --- Simple, safe local correction ---
+      function localCorrect(text) {
+        // If preserve info, mask digit sequences
+        const preserve = el("preserveInfo").checked;
+        const masks = [];
+        if (preserve) {
+          text = text.replace(/\d[\d\.\-/]{0,}\d/gi, (match) => {
+            const key = `__#${masks.length}#__`;
+            masks.push({ key, val: match });
+            return key;
+          });
         }
 
-        function clearAll() {
-            document.getElementById('textInput').value = '';
-            document.getElementById('results').classList.remove('show');
-            document.getElementById('resultsContent').innerHTML = '';
+        // Normalize spaces and punctuation
+        text = text.replace(/[ \t]+/g, " ");
+        text = text.replace(/ ?\n ?/g, "\n");
+        text = text.replace(/\n{3,}/g, "\n\n");
+        text = text.replace(/\s+([,;:\.\?\!])/g, "$1");
+        text = text.replace(/([,;:\.\?\!])([^\s\}\]\)"'”’])/g, "$1 $2");
+        text = text.replace(/\.{2,}/g, ".");
+        text = text.replace(/,{2,}/g, ",");
+
+        // Normalize typographic quotes and dashes
+        text = text.replace(/"([^"]*)"/g, "“$1”");
+        text = text.replace(/(?<=\s|^)'([^']*)'(?=[\s,.;:!?]|$)/g, "‘$1’");
+        text = text.replace(/(\S) ?-- ?(\S)/g, "$1 — $2");
+        text = text.replace(/(\d)\s*-\s*(\d)/g, "$1-$2");
+
+        // Basic replacements for common informal abbreviations (safe list)
+        const safeRepl = {
+          "\\bvc\\b": "você",
+          "\\bvcs\\b": "vocês",
+          "\\btb\\b": "também",
+          "\\btbm\\b": "também",
+          "\\bpq\\b": "porque",
+          "\\bq\\b": "que",
+          "\\bhj\\b": "hoje",
+          "\\bmt\\b": "muito",
+          "\\bmto\\b": "muito",
+          "\\bqdo\\b": "quando",
+          "\\bqto\\b": "quanto",
+          "\\bobs\\b": "observação",
+          "\\bta\\b": "está",
+          "\\btá\\b": "está",
+          "\\bpra\\b": "para",
+          "\\bpro\\b": "para o",
+          "\\bnum\\b": "em um",
+          "\\bnuma\\b": "em uma",
+          "\\baté\\s+q\\b": "até que",
+        };
+        for (const pattern in safeRepl) {
+          const re = new RegExp(pattern, "gi");
+          text = text.replace(re, safeRepl[pattern]);
         }
 
-        // Permite usar Enter com Ctrl para verificar
-        document.getElementById('textInput').addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'Enter') {
-                checkText();
-            }
+        // Common typo fixes (safe, unambiguous)
+        const typoRepl = {
+          "\\bpodemos\\s+afim\\s+de\\b": "podemos a fim de",
+          "\\bafim\\s+de\\b": "a fim de",
+          "\\bao\\s+encontro\\s+de\\b": "ao encontro de",
+          "\\bde\\s+encontro\\s+a\\b": "de encontro a",
+          "\\bmim\\s+mesmo\\b": "eu mesmo",
+          "\\bhá\\s+de\\s+se\\s+considerar\\b": "há de se considerar",
+          "\\bpor\\s+a\\s+causa\\s+de\\b": "por causa de",
+        };
+        for (const pattern in typoRepl) {
+          const re = new RegExp(pattern, "gi");
+          text = text.replace(re, typoRepl[pattern]);
+        }
+
+        // Remove trailing space before line breaks and collapse repeated words
+        text = text.replace(/\b(\w+)\s+\1\b/gi, "$1");
+
+        // Capitalize first letter of sentences (simple)
+        text = text.replace(
+          /(^|[\.\!\?]\s+)([a-zà-ú])/g,
+          (m, p1, p2) => p1 + p2.toUpperCase(),
+        );
+
+        // restore masks
+        if (preserve && masks.length) {
+          masks.forEach((m) => {
+            text = text.replace(m.key, m.val);
+          });
+        }
+        return text.trim();
+      }
+
+      // --- requestAIReview: chama a função serverless (api/review.js) ---
+      async function requestAIReview(text, mode) {
+        const response = await fetch("/api/review", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, mode }),
         });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || "Falha ao consultar a IA.");
+        }
+        return data.result || "";
+      }
+
+      // --- Main review flow ---
+      async function applyReview() {
+        const mode = document.querySelector("#modes .mode.selected").dataset
+          .mode;
+        const text = el("originalText").value || "";
+        if (!text.trim()) {
+          alert("Cole ou escreva o texto que deseja revisar.");
+          return;
+        }
+
+        const btn = el("reviewBtn");
+        const originalLabel = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = "⏳ Revisando...";
+        el("resultBox").textContent = "";
+        el("resultBox").innerHTML =
+          '<div style="color:var(--blue-gray);font-style:italic">Consultando IA para revisão jurídica...</div>';
+
+        try {
+          const result = await requestAIReview(text, mode);
+          showResult(result);
+        } catch (err) {
+          el("resultBox").textContent = "";
+          const box = document.createElement("div");
+          box.innerHTML = `<div style="font-weight:700;color:#a13f3f;margin-bottom:8px">Não foi possível concluir a revisão</div>
+                    <div style="color:var(--blue-gray);">${err.message || "Erro ao conectar com o servidor de IA."}</div>`;
+          el("resultBox").appendChild(box);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = originalLabel;
+        }
+      }
+
+      function showResult(htmlOrText) {
+        el("resultBox").textContent = "";
+        if (typeof htmlOrText === "string")
+          el("resultBox").textContent = htmlOrText;
+        else el("resultBox").appendChild(htmlOrText);
+      }
+
+      // --- copy & toggle original ---
+      function copyResult() {
+        const txt = el("resultBox").textContent || "";
+        if (!txt) return;
+        navigator.clipboard.writeText(txt).then(() => {
+          el("copiedLabel").style.display = "inline";
+          setTimeout(() => (el("copiedLabel").style.display = "none"), 1600);
+          const b = el("copyBtn");
+          b.textContent = "✓ Copiado";
+          setTimeout(() => (b.textContent = "Copiar texto"), 1600);
+        });
+      }
+
+      function clearAll() {
+        const t = el("originalText");
+        if (t.value.trim() && !confirm("Deseja realmente limpar o texto?"))
+          return;
+        t.value = "";
+        updateCounts();
+        el("resultBox").textContent = "";
+        localStorage.removeItem(DRAFT_KEY);
+      }
+
+      // --- Modes selection UI ---
+      document.addEventListener("click", (e) => {
+        const modeEl = e.target.closest(".mode");
+        if (modeEl) {
+          document
+            .querySelectorAll(".mode")
+            .forEach((m) => m.classList.remove("selected"));
+          modeEl.classList.add("selected");
+          modeEl.querySelector("input").checked = true;
+        }
+      });
+
+      // --- Daily tips rendering & favorites ---
+      function dailyIndex(len) {
+        const d = new Date();
+        const key = d.toISOString().slice(0, 10);
+        // deterministic per day
+        let n = 0;
+        for (let i = 0; i < key.length; i++) n += key.charCodeAt(i);
+        return n % len;
+      }
+
+      function renderDaily() {
+        const di = dailyIndex(tips.length);
+        const ci = dailyIndex(connectives.length);
+        const vi = dailyIndex(vocabulary.length);
+        const container = el("dailyTips");
+        container.innerHTML = "";
+        const createTip = (title, cssClass, role, item, type, idx) => {
+          const elc = document.createElement("div");
+          elc.className = `tip ${cssClass}`;
+          elc.innerHTML = `
+            <strong>${title}</strong>
+            <div class="tip-word">${item.text}<span class="tip-role">${role}</span></div>
+            <div class="tip-meaning">${item.meaning}</div>
+            <div class="tip-example">Exemplo: ${item.example}</div>
+            <div style="margin-top:10px;text-align:right"><button data-type="${type}" data-idx="${idx}" class="btn ghost saveBtn">☆ Salvar</button></div>`;
+          return elc;
+        };
+        container.appendChild(
+          createTip(
+            "✍️ Português do dia",
+            "tip-portugues",
+            "Dica",
+            tips[di],
+            "tips",
+            di,
+          ),
+        );
+        container.appendChild(
+          createTip(
+            "🔗 Conectivo do dia",
+            "tip-conectivo",
+            "Conectivo",
+            connectives[ci],
+            "connectives",
+            ci,
+          ),
+        );
+        container.appendChild(
+          createTip(
+            "⚖️ Palavra jurídica do dia",
+            "tip-palavra",
+            "Termo",
+            vocabulary[vi],
+            "vocab",
+            vi,
+          ),
+        );
+        // mark saved
+        setTimeout(markSavedButtons, 50);
+      }
+
+      function markSavedButtons() {
+        document.querySelectorAll(".saveBtn").forEach((btn) => {
+          const type = btn.dataset.type,
+            idx = btn.dataset.idx;
+          const key = `juris_fav_${type}_${idx}`;
+          if (localStorage.getItem(key)) btn.textContent = "★ Salvo";
+          else btn.textContent = "☆ Salvar";
+        });
+      }
+
+      function toggleSave(type, idx) {
+        const key = `juris_fav_${type}_${idx}`;
+        if (localStorage.getItem(key)) {
+          localStorage.removeItem(key);
+        } else {
+          let item = null;
+          if (type === "tips") item = tips[idx];
+          if (type === "connectives") item = connectives[idx];
+          if (type === "vocab") item = vocabulary[idx];
+          if (item) localStorage.setItem(key, JSON.stringify(item));
+        }
+        renderFavorites();
+        markSavedButtons();
+      }
+
+      function renderFavorites() {
+        const area = el("favoritesArea");
+        area.innerHTML = "";
+        const items = Object.keys(localStorage).filter((k) =>
+          k.startsWith("juris_fav_"),
+        );
+        if (items.length === 0) {
+          area.innerHTML =
+            '<div class="fav-empty">Nenhum favorito salvo ainda.</div>';
+          return;
+        }
+        items.forEach((k) => {
+          const raw = localStorage.getItem(k);
+          let item;
+          try {
+            item = JSON.parse(raw);
+          } catch {
+            item = { text: raw };
+          }
+          const node = document.createElement("div");
+          node.className = "fav-item";
+          node.innerHTML = `<div style="color:var(--deep-blue); font-weight:600">${item.text}</div><button class="fav-remove" data-key="${k}">Remover</button>`;
+          area.appendChild(node);
+        });
+      }
+
+      // --- Bank modal render ---
+      function renderBank() {
+        const map = {
+          bankConclusion: "conclusion",
+          bankContrast: "contrast",
+          bankAddition: "addition",
+          bankExplain: "explanation",
+          bankContext: "context",
+        };
+        for (const elId in map) {
+          const list = bank[map[elId]] || [];
+          const container = el(elId);
+          container.innerHTML = "";
+          list.forEach((w) => {
+            const c = document.createElement("div");
+            c.className = "chip";
+            c.textContent = w;
+            container.appendChild(c);
+          });
+        }
+      }
+
+      // --- Events ---
+      document.addEventListener("input", (e) => {
+        if (e.target.id === "originalText") {
+          updateCounts();
+          saveDraft();
+        }
+      });
+      el("reviewBtn").addEventListener("click", applyReview);
+      el("copyBtn").addEventListener("click", copyResult);
+      el("clearBtn").addEventListener("click", clearAll);
+      el("toggleView").addEventListener("click", () => {
+        const btn = el("toggleView");
+        if (btn.dataset.showing === "orig") {
+          btn.textContent = "Ver original";
+          btn.dataset.showing = "";
+          showResult(localCorrect(el("originalText").value));
+        } else {
+          btn.textContent = "Ver revisado";
+          btn.dataset.showing = "orig";
+          showResult(el("originalText").value);
+        }
+      });
+
+      // Save buttons in daily
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("saveBtn")) {
+          const t = e.target.dataset.type,
+            i = e.target.dataset.idx;
+          toggleSave(t, i);
+        }
+        if (e.target.dataset && e.target.dataset.key) {
+          localStorage.removeItem(e.target.dataset.key);
+          renderFavorites();
+          markSavedButtons();
+        }
+      });
+
+      // --- Track last cursor position in the textarea for connective insertion ---
+      let lastCursorPos = null;
+      el("originalText").addEventListener("keyup", updateCursorPos);
+      el("originalText").addEventListener("click", updateCursorPos);
+      function updateCursorPos() {
+        lastCursorPos = {
+          start: el("originalText").selectionStart,
+          end: el("originalText").selectionEnd,
+        };
+      }
+
+      function insertAtCursor(word) {
+        const ta = el("originalText");
+        const start = lastCursorPos ? lastCursorPos.start : ta.value.length;
+        const end = lastCursorPos ? lastCursorPos.end : ta.value.length;
+        const before = ta.value.slice(0, start);
+        const after = ta.value.slice(end);
+        const needsSpaceBefore = before && !/\s$/.test(before);
+        const needsSpaceAfter = after && !/^\s/.test(after);
+        const insert =
+          (needsSpaceBefore ? " " : "") + word + (needsSpaceAfter ? " " : "");
+        ta.value = before + insert + after;
+        const newPos = start + insert.length;
+        ta.focus();
+        ta.setSelectionRange(newPos, newPos);
+        lastCursorPos = { start: newPos, end: newPos };
+        updateCounts();
+        saveDraft();
+      }
+
+      // Bank modal
+      el("bankBtn").addEventListener("click", () => {
+        updateCursorPos();
+        el("bankModal").style.display = "flex";
+      });
+      el("closeBank").addEventListener(
+        "click",
+        () => (el("bankModal").style.display = "none"),
+      );
+      el("openBankSmall").addEventListener("click", (e) => {
+        e.preventDefault();
+        updateCursorPos();
+        el("bankModal").style.display = "flex";
+      });
+      el("bankModal").addEventListener("click", (e) => {
+        if (e.target.id === "bankModal") el("bankModal").style.display = "none";
+      });
+
+      // --- Keyboard shortcuts ---
+      document.addEventListener("keydown", (e) => {
+        const modalOpen = el("bankModal").style.display === "flex";
+        if (e.key === "Escape" && modalOpen) {
+          el("bankModal").style.display = "none";
+          return;
+        }
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+          e.preventDefault();
+          applyReview();
+          return;
+        }
+      });
+
+      // initial render
+      restoreDraft();
+      renderDaily();
+      renderFavorites();
+      renderBank();
+      updateCounts();
+
+      // Chips: insere o conectivo na posição do cursor do texto original
+      document.addEventListener("click", (e) => {
+        if (e.target.classList && e.target.classList.contains("chip")) {
+          insertAtCursor(e.target.textContent);
+          el("bankModal").style.display = "none";
+        }
+      });
     </script>
-</body>
+  </body>
 </html>

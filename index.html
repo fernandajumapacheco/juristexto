@@ -3,7 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>⚖️ JurisTexto — Assistente de Redação e Português Jurídico</title>
+    <title>🖋️✨ JurisTexto — Assistente de Redação e Português Jurídico</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%96%8B%EF%B8%8F%3C/text%3E%3C/svg%3E"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%234c4a91'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle'%3E%F0%9F%96%8B%EF%B8%8F%3C/text%3E%3C/svg%3E"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -99,8 +107,8 @@
           var(--deep-blue),
           var(--deep-blue-dark)
         );
-        box-shadow: 0 6px 16px rgba(11, 61, 102, 0.28);
-        font-size: 22px;
+        box-shadow: 0 6px 16px rgba(76, 74, 145, 0.3);
+        font-size: 21px;
         flex-shrink: 0;
       }
       .brand-text {
@@ -323,11 +331,11 @@
       }
       .btn.ghost {
         background: #fff;
-        border-color: var(--border);
+        border-color: var(--border-strong);
         color: var(--deep-blue);
       }
       .btn.ghost:hover {
-        border-color: var(--border-strong);
+        border-color: var(--accent);
         background: var(--light);
       }
       .btn.warn {
@@ -686,7 +694,7 @@
     <div class="wrap">
       <header>
         <div class="brand">
-          <div class="brand-mark">⚖️</div>
+          <div class="brand-mark">🖋️✨</div>
           <div class="brand-text">
             <div class="title">JurisTexto</div>
             <div class="subtitle">
@@ -695,7 +703,7 @@
           </div>
         </div>
         <div class="header-badge">
-          <span class="dot"></span> Processamento local
+          <span class="dot"></span> Revisão local + IA
         </div>
       </header>
 
@@ -835,7 +843,7 @@
               ></div>
             </div>
 
-            <div class="card">
+            <div class="card" style="background: linear-gradient(180deg, var(--lilac-5), #fff 90px)">
               <div class="card-title">⏱️ 3 Minutos de Português Jurídico</div>
               <div class="daily" id="dailyTips"></div>
               <div style="margin-top: 14px">

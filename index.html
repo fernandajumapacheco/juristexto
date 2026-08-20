@@ -20,33 +20,33 @@
     />
     <style>
       :root {
-        --deep-blue: #4c4a91;
-        --deep-blue-dark: #383667;
-        --accent: #7b7fd1;
-        --blue-gray: #6b6c8a;
+        --deep-blue: #6866a8;
+        --deep-blue-dark: #57548f;
+        --accent: #9497dd;
+        --blue-gray: #7c7d97;
         --soft-green: #1f8f5f;
         --soft-gold: #a9822f;
-        --bg: #eef1fb;
-        --bg-grad-1: #f3f4fd;
-        --bg-grad-2: #e4e2fb;
+        --bg: #f4f3fc;
+        --bg-grad-1: #f8f7fd;
+        --bg-grad-2: #edebfa;
         --card: #ffffff;
-        --muted: #9294b3;
-        --light: #f0f1fb;
-        --border: #d5d9f2;
-        --border-strong: #c7d6f7;
-        --text: #2a2a45;
-        --lilac-1: #abc0f6;
-        --lilac-2: #c7d6f7;
-        --lilac-3: #d5d9f2;
-        --lilac-4: #e4e2fb;
-        --lilac-5: #ede9fb;
+        --muted: #a1a2bc;
+        --light: #f4f3fb;
+        --border: #e2e1f5;
+        --border-strong: #d3d2ef;
+        --text: #34334a;
+        --lilac-1: #c3d0f9;
+        --lilac-2: #dbe3fa;
+        --lilac-3: #e5e4f7;
+        --lilac-4: #efedfc;
+        --lilac-5: #f5f3fd;
         --radius: 14px;
         --radius-sm: 10px;
-        --shadow-sm: 0 1px 2px rgba(76, 74, 145, 0.07);
+        --shadow-sm: 0 1px 2px rgba(104, 102, 168, 0.06);
         --shadow:
-          0 10px 30px -8px rgba(76, 74, 145, 0.18),
-          0 2px 8px rgba(76, 74, 145, 0.07);
-        --shadow-lg: 0 20px 50px -12px rgba(76, 74, 145, 0.24);
+          0 10px 30px -8px rgba(104, 102, 168, 0.14),
+          0 2px 8px rgba(104, 102, 168, 0.05);
+        --shadow-lg: 0 20px 50px -12px rgba(104, 102, 168, 0.2);
         --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
         --font-sans:
           "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
@@ -161,11 +161,71 @@
         gap: 22px;
       }
 
-      /* Large layout: side-by-side editor + result */
+      /* Large layout: main workspace + sidebar */
       @media (min-width: 960px) {
         .grid {
-          grid-template-columns: 1fr 480px;
+          grid-template-columns: 1fr 380px;
         }
+      }
+
+      /* Segmented pill selector for modes */
+      .seg {
+        display: inline-flex;
+        background: var(--lilac-4);
+        border-radius: 999px;
+        padding: 4px;
+        gap: 2px;
+        flex-wrap: wrap;
+      }
+      .seg button {
+        border: none;
+        background: transparent;
+        padding: 9px 16px;
+        border-radius: 999px;
+        font-family: inherit;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--blue-gray);
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          color 0.15s,
+          box-shadow 0.15s;
+      }
+      .seg button.on {
+        background: #fff;
+        color: var(--deep-blue);
+        box-shadow: var(--shadow-sm);
+      }
+      .seg button:hover:not(.on) {
+        color: var(--deep-blue);
+      }
+      .seg button:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .seg-desc {
+        font-size: 12.5px;
+        color: var(--blue-gray);
+        margin: 10px 2px 0;
+        line-height: 1.5;
+      }
+
+      /* Side-by-side original / result panes */
+      .panes {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      @media (min-width: 760px) {
+        .panes {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .pane {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
 
       .editor {
@@ -194,7 +254,7 @@
       }
       textarea {
         width: 100%;
-        min-height: 380px;
+        min-height: 320px;
         resize: vertical;
         padding: 16px;
         border-radius: var(--radius-sm);
@@ -236,63 +296,6 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-      }
-
-      .modes {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-      .mode {
-        flex: 1 1 160px;
-        min-width: 150px;
-        border-radius: var(--radius-sm);
-        padding: 14px;
-        background: var(--light);
-        border: 1.5px solid var(--border);
-        cursor: pointer;
-        transition:
-          transform 0.16s ease,
-          box-shadow 0.16s ease,
-          border-color 0.16s ease,
-          background 0.16s ease;
-        position: relative;
-      }
-      .mode:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 22px -6px rgba(11, 61, 102, 0.16);
-        border-color: var(--border-strong);
-      }
-      .mode input {
-        display: none;
-      }
-      .mode.selected {
-        border-color: var(--accent);
-        background: linear-gradient(180deg, #ffffff, #f3f8fd);
-        box-shadow:
-          0 6px 18px -4px rgba(26, 95, 158, 0.28),
-          inset 0 0 0 1px rgba(26, 95, 158, 0.15);
-      }
-      .mode.selected::after {
-        content: "✓";
-        position: absolute;
-        top: 8px;
-        right: 10px;
-        color: var(--accent);
-        font-weight: 800;
-        font-size: 12px;
-      }
-      .mode h4 {
-        margin: 0;
-        font-size: 13px;
-        color: var(--deep-blue);
-        font-weight: 700;
-      }
-      .mode p {
-        margin: 6px 0 0;
-        font-size: 12px;
-        color: var(--blue-gray);
-        line-height: 1.4;
       }
 
       .controls {
@@ -431,7 +434,7 @@
         font-size: 14px;
       }
       .result-area {
-        min-height: 240px;
+        min-height: 320px;
         padding: 14px;
         background: var(--light);
         border: 1px solid var(--border);
@@ -711,89 +714,138 @@
         <div class="grid">
           <section class="editor">
             <div>
+              <label class="field-label">Como deseja revisar?</label>
               <div
-                style="
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                  gap: 8px;
-                "
+                class="seg"
+                id="modes"
+                style="margin-top: 10px"
+                role="radiogroup"
               >
-                <label class="field-label" for="originalText"
-                  >📝 Texto original</label
+                <button
+                  type="button"
+                  class="seg-btn"
+                  data-mode="objetivar"
+                  role="radio"
+                  aria-checked="false"
                 >
-                <span
-                  id="autosaveHint"
-                  style="
-                    font-size: 11.5px;
-                    color: var(--soft-green);
-                    font-weight: 600;
-                    opacity: 0;
-                    transition: opacity 0.3s;
-                  "
-                  >💾 Rascunho salvo</span
+                  Tornar mais objetivo
+                </button>
+                <button
+                  type="button"
+                  class="seg-btn"
+                  data-mode="melhorar"
+                  role="radio"
+                  aria-checked="false"
                 >
+                  Melhorar redação
+                </button>
+                <button
+                  type="button"
+                  class="seg-btn on"
+                  data-mode="completo"
+                  role="radio"
+                  aria-checked="true"
+                >
+                  Revisão completa
+                </button>
               </div>
-              <div class="textarea-wrap" style="margin-top: 8px">
-                <textarea
-                  id="originalText"
-                  placeholder="Cole ou escreva aqui o texto que deseja revisar..."
-                ></textarea>
-              </div>
-              <div
-                class="meta"
-                style="margin-top: 10px; justify-content: space-between"
-              >
-                <div style="display: flex; gap: 8px; align-items: center">
-                  <div class="stat" id="wordCount">📊 Palavras: 0</div>
-                  <div class="stat" id="charCount">Caracteres: 0</div>
-                </div>
-                <div style="display: flex; gap: 8px; align-items: center">
-                  <label class="checkbox"
-                    ><input type="checkbox" id="preserveInfo" checked />
-                    Preservar informações do texto original</label
-                  >
-                </div>
+              <div class="seg-desc" id="modeDesc">
+                Corrige português, gramática, clareza e coerência.
               </div>
             </div>
 
-            <div>
-              <label class="field-label">Como deseja revisar?</label>
-              <div class="modes" id="modes" style="margin-top: 10px">
-                <label class="mode" data-mode="objetivar">
-                  <input type="radio" name="mode" value="objetivar" />
-                  <h4>1. Tornar mais objetivo</h4>
-                  <p>Reduzir redundâncias e prolixidade preservando o sentido.</p>
-                </label>
-                <label class="mode" data-mode="melhorar">
-                  <input type="radio" name="mode" value="melhorar" />
-                  <h4>2. Melhorar redação jurídica</h4>
-                  <p>Aprimorar fluidez, conectivos e vocabulário jurídico.</p>
-                </label>
-                <label class="mode selected" data-mode="completo">
-                  <input type="radio" name="mode" value="completo" checked />
-                  <h4>3. Revisão completa</h4>
-                  <p>
-                    Corrige o português e combina objetividade com fluidez
-                    jurídica.
-                  </p>
-                </label>
+            <div class="panes" style="margin-top: 16px">
+              <div class="pane">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 8px;
+                  "
+                >
+                  <label class="field-label" for="originalText"
+                    >📝 Texto original</label
+                  >
+                  <span
+                    id="autosaveHint"
+                    style="
+                      font-size: 11.5px;
+                      color: var(--soft-green);
+                      font-weight: 600;
+                      opacity: 0;
+                      transition: opacity 0.3s;
+                    "
+                    >💾 Rascunho salvo</span
+                  >
+                </div>
+                <div class="textarea-wrap">
+                  <textarea
+                    id="originalText"
+                    placeholder="Cole ou escreva aqui o texto que deseja revisar..."
+                  ></textarea>
+                </div>
+                <div class="meta" style="justify-content: space-between">
+                  <div style="display: flex; gap: 8px; align-items: center">
+                    <div class="stat" id="wordCount">📊 Palavras: 0</div>
+                    <div class="stat" id="charCount">Caracteres: 0</div>
+                  </div>
+                </div>
               </div>
 
-              <div class="controls">
-                <button
-                  class="btn primary"
-                  id="reviewBtn"
-                  title="Atalho: Ctrl/Cmd + Enter"
+              <div class="pane">
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 8px;
+                  "
                 >
-                  ⚖️ Revisar texto
-                </button>
-                <button class="btn ghost" id="copyBtn">Copiar texto</button>
-                <button class="btn warn" id="clearBtn">Limpar</button>
-                <button class="btn soft" id="bankBtn">
-                  🔗 Banco de conectivos
-                </button>
+                  <label class="field-label">✅ Texto revisado</label>
+                  <div class="result-actions">
+                    <button class="btn ghost" id="toggleView">
+                      Ver original
+                    </button>
+                    <span
+                      id="copiedLabel"
+                      style="
+                        color: var(--soft-green);
+                        font-weight: 700;
+                        display: none;
+                      "
+                      >✓ Copiado</span
+                    >
+                  </div>
+                </div>
+                <div
+                  id="resultBox"
+                  class="result-area"
+                  aria-live="polite"
+                ></div>
               </div>
+            </div>
+
+            <div class="meta" style="margin-top: 4px">
+              <label class="checkbox"
+                ><input type="checkbox" id="preserveInfo" checked />
+                Preservar informações do texto original</label
+              >
+            </div>
+
+            <div class="controls">
+              <button
+                class="btn primary"
+                id="reviewBtn"
+                title="Atalho: Ctrl/Cmd + Enter"
+              >
+                ⚖️ Revisar texto
+              </button>
+              <button class="btn ghost" id="copyBtn">Copiar texto</button>
+              <button class="btn warn" id="clearBtn">Limpar</button>
+              <button class="btn soft" id="bankBtn">
+                🔗 Banco de conectivos
+              </button>
             </div>
 
             <div class="safety-card">
@@ -810,39 +862,6 @@
           </section>
 
           <aside class="results">
-            <div class="card">
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  gap: 8px;
-                "
-              >
-                <div class="card-title">✅ Texto revisado</div>
-                <div class="result-actions">
-                  <button class="btn ghost" id="toggleView">
-                    Ver original
-                  </button>
-                  <span
-                    id="copiedLabel"
-                    style="
-                      color: var(--soft-green);
-                      font-weight: 700;
-                      display: none;
-                    "
-                    >✓ Copiado</span
-                  >
-                </div>
-              </div>
-              <div
-                id="resultBox"
-                class="result-area"
-                aria-live="polite"
-                style="margin-top: 10px"
-              ></div>
-            </div>
-
             <div class="card" style="background: linear-gradient(180deg, var(--lilac-5), #fff 90px)">
               <div class="card-title">⏱️ 3 Minutos de Português Jurídico</div>
               <div class="daily" id="dailyTips"></div>
@@ -1409,7 +1428,7 @@
 
       // --- Main review flow ---
       async function applyReview() {
-        const mode = document.querySelector("#modes .mode.selected").dataset
+        const mode = document.querySelector("#modes .seg-btn.on").dataset
           .mode;
         const text = el("originalText").value || "";
         if (!text.trim()) {
@@ -1471,14 +1490,22 @@
       }
 
       // --- Modes selection UI ---
+      const modeDescriptions = {
+        objetivar: "Reduz redundâncias e prolixidade preservando o sentido.",
+        melhorar: "Aprimora fluidez, conectivos e vocabulário jurídico.",
+        completo: "Corrige português, gramática, clareza e coerência.",
+      };
       document.addEventListener("click", (e) => {
-        const modeEl = e.target.closest(".mode");
+        const modeEl = e.target.closest(".seg-btn");
         if (modeEl) {
-          document
-            .querySelectorAll(".mode")
-            .forEach((m) => m.classList.remove("selected"));
-          modeEl.classList.add("selected");
-          modeEl.querySelector("input").checked = true;
+          document.querySelectorAll("#modes .seg-btn").forEach((m) => {
+            m.classList.remove("on");
+            m.setAttribute("aria-checked", "false");
+          });
+          modeEl.classList.add("on");
+          modeEl.setAttribute("aria-checked", "true");
+          el("modeDesc").textContent =
+            modeDescriptions[modeEl.dataset.mode] || "";
         }
       });
 
